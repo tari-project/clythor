@@ -1,0 +1,14 @@
+[advisories]
+ignore = [
+
+    # We are not using a special allocator and will not suffer this issue
+    "RUSTSEC-2021-0145",
+
+    # We are not calling the affected function
+    "RUSTSEC-2024-0336",
+
+    # Unmaintained but a dependency of our dependencies
+    "RUSTSEC-2024-0320",
+    "RUSTSEC-2024-0370",
+
+]
