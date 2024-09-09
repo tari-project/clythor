@@ -5,8 +5,7 @@
 
 set -e
 
-diffparms="-u --suppress-blank-empty --strip-trailing-cr --color=never"
-
+diffparms=${diffparms:-"-u --suppress-blank-empty --strip-trailing-cr --color=never"}
 rgTemp=${rgTemp:-$(mktemp)}
 
 # rg -i "Copyright.*The Tari Project" --files-without-match \
