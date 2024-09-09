@@ -44,9 +44,22 @@ mod http;
 mod shared_dataset;
 mod stats_store;
 
-pub fn base_path(cli: &Cli) -> PathBuf {
+fn base_path(cli: &Cli) -> PathBuf {
     let path = cli.base_path.clone().unwrap_or(env!("CARGO_MANIFEST_DIR").to_string());
     PathBuf::from(path)
+}
+
+fn log_path(cli: &Cli) -> PathBuf {
+    match cli.log_path.as_ref() {
+        Some(path) => {
+            if path.is_absolute() {
+                path.clone()
+            } else {
+                base_path(cli).join(path)
+            }
+        },
+        None => base_path(cli).join("log/clythor"),
+    }
 }
 
 #[tokio::main]
@@ -70,7 +83,7 @@ async fn main_inner() -> Result<(), ExitError> {
     let cli = Cli::parse();
     initialize_logging(
         &base_path(&cli).join("config").join("clythor").join("log4rs.yml"),
-        &base_path(&cli),
+        &log_path(&cli),
         include_str!("../log4rs_sample.yml"),
     )?;
     start_miner(cli)
