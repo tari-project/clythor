@@ -45,6 +45,8 @@ pub struct RandomXMinerConfig {
     pub num_mining_threads: usize,
     /// How long to wait before checking for a new template in milliseconds
     pub template_refresh_interval_ms: u64,
+    /// The port for the http server to run on
+    pub http_port: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, PartialEq, Clone)]
@@ -71,6 +73,7 @@ impl Default for RandomXMinerConfig {
             config_dir: PathBuf::from("config/clythor"),
             num_mining_threads: num_cpus::get(),
             template_refresh_interval_ms: 15000,
+            http_port: 18000,
         }
     }
 }

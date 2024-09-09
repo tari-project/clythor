@@ -32,22 +32,25 @@ use tari_common::configuration::{ConfigOverrideProvider, Network};
 pub struct Cli {
     #[clap(flatten)]
     pub common: CommonCliArgs,
-    #[clap(long, alias = "monero-base-node-address")]
+    #[clap(long)]
     pub monero_base_node_address: Option<String>,
-    #[clap(long, alias = "monero-wallet-address")]
+    #[clap(long, alias = "user")]
     pub monero_wallet_address: Option<String>,
-    #[clap(long, alias = "mine-until-height")]
+    #[clap(long)]
     pub mine_until_height: Option<u64>,
-    #[clap(long, alias = "max-blocks")]
+    #[clap(long)]
     pub miner_max_blocks: Option<u64>,
-    #[clap(long, alias = "min-difficulty")]
+    #[clap(long)]
     pub miner_min_diff: Option<u64>,
-    #[clap(long, alias = "max-difficulty")]
+    #[clap(long)]
     pub miner_max_diff: Option<u64>,
     #[clap(short, long, alias = "non-interactive", env = "TARI_NON_INTERACTIVE")]
     pub non_interactive_mode: bool,
-    #[clap(short = 't', long, alias = "num-mining-threads")]
+    #[clap(short = 't', long, alias = "threads")]
     pub num_mining_threads: Option<usize>,
+    /// The port for the http server. Default: 18000
+    #[clap(short = 'p', long, alias = "http-port")]
+    pub http_port: Option<u16>,
 }
 
 impl ConfigOverrideProvider for Cli {

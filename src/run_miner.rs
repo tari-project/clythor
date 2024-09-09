@@ -52,7 +52,7 @@ pub const LOG_TARGET: &str = "clythor::main";
 
 pub async fn start_miner(cli: Cli) -> Result<(), Error> {
     let config_path = cli.common.config_path();
-    let cfg = load_configuration(config_path.as_path(), true, cli.non_interactive_mode, &cli)?;
+    let cfg = load_configuration(config_path.as_path(), true, true, &cli)?;
     let mut config = RandomXMinerConfig::load_from(&cfg).expect("Failed to load config");
     config.set_base_path(cli.common.get_base_path());
 
