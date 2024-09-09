@@ -188,10 +188,10 @@ fn thread_work<'a>(
                 }
 
                 let elapsed_since_last_check = Instant::now().duration_since(stats_last_check_time);
-                // Add a little entropy on the check time to try and lower the frequency of threads attempting to update
-                // the AtomicU64
+                // Spread out the updates by a few MS to reduce the chances of multiple threads trying to update
+                // the AtomicU64 at the same time.
                 let check_time =
-                    Duration::from_secs(5) + Duration::from_millis((num_threads * 100 / thread_number) as u64);
+                    Duration::from_secs(5) + Duration::from_millis((num_threads * 100 / (thread_number+1)) as u64);
                 if elapsed_since_last_check >= check_time {
                     info!(target: LOG_TARGET, "{}", stats_store.pretty_print(thread_number, nonce, cycle_start.elapsed().as_secs(), max_difficulty_reached, block_template.difficulty));
                     stats_last_check_time = Instant::now();

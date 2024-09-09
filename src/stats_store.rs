@@ -48,6 +48,10 @@ impl StatsStore {
     }
 
     pub fn hashes_per_second(&self) -> u64 {
+        if self.elapsed_time() == 0 {
+            return 0;
+        }
+
         self.hashed_count.load(Ordering::SeqCst) / self.elapsed_time()
     }
 
