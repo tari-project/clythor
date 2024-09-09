@@ -21,7 +21,7 @@
 //   USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pub struct Config {
-    pub port: u64,
+    pub port: u16,
 }
 
 impl Default for Config {
@@ -31,7 +31,7 @@ impl Default for Config {
 }
 
 impl Config {
-    pub fn new(port: u64) -> Self {
+    pub fn new(port: u16) -> Self {
         Self { port }
     }
 }

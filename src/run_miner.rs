@@ -26,33 +26,26 @@ use std::{
     thread,
     time::{Duration, Instant},
 };
-
 use dialoguer::Input as InputPrompt;
 use log::{debug, error, info};
 use minotari_app_utilities::parse_miner_input::process_quit;
 use randomx_rs::RandomXFlag;
 use reqwest::Client as ReqwestClient;
-use tari_common::{load_configuration, DefaultConfigLoader};
 use tari_core::proof_of_work::{
     randomx_factory::{RandomXFactory, RandomXVMInstance},
     Difficulty,
 };
 use tari_shutdown::Shutdown;
 
-use crate::{cli::Cli, config::RandomXMinerConfig, error::{ConfigError, Error, MiningError, MiningError::TokioRuntime}, http, json_rpc::{get_block_template::get_block_template, submit_block::submit_block}, shared_dataset::SharedDataset, stats_store::StatsStore};
+use crate::{cli::Cli, error::{ConfigError, Error, MiningError, MiningError::TokioRuntime}, http, json_rpc::{get_block_template::get_block_template, submit_block::submit_block}, shared_dataset::SharedDataset, stats_store::StatsStore};
 use crate::http::server::HttpServer;
 
 pub const LOG_TARGET: &str = "clythor::main";
 
 pub async fn start_miner(cli: Cli) -> Result<(), Error> {
-    let config_path = cli.common.config_path();
-    let cfg = load_configuration(config_path.as_path(), true, true, &cli)?;
-    let mut config = RandomXMinerConfig::load_from(&cfg).expect("Failed to load config");
-    config.set_base_path(cli.common.get_base_path());
-
-    let node_address = monero_base_node_address(&cli, &config)?;
-    let monero_wallet_address = monero_wallet_address(&cli, &config)?;
-    let num_threads = cli.num_mining_threads.unwrap_or(config.num_mining_threads);
+    let node_address = monero_base_node_address(&cli)?;
+    let monero_wallet_address = monero_wallet_address(&cli)?;
+    let num_threads = cli.num_mining_threads.unwrap_or(num_cpus::get());
 
     let mut shutdown = Shutdown::new();
     let client = ReqwestClient::new();
@@ -65,7 +58,7 @@ pub async fn start_miner(cli: Cli) -> Result<(), Error> {
     let stats_store = Arc::new(StatsStore::new(num_threads));
 
     // http server
-    let http_server_config = http::config::Config::new(config.http_port);
+    let http_server_config = http::config::Config::new(cli.http_port.unwrap_or(18000u16));
     let http_server = HttpServer::new(shutdown.to_signal(), http_server_config, stats_store.clone());
     tokio::spawn(async move {
         if let Err(error) = http_server.start().await {
@@ -83,7 +76,7 @@ pub async fn start_miner(cli: Cli) -> Result<(), Error> {
             let randomx_factory = &randomx_factory;
             let dataset = shared_dataset.clone();
             let stats = stats_store.clone();
-            let config = &config;
+            let cli = &cli;
 
             s.spawn(move || {
                 thread_work(
@@ -95,7 +88,7 @@ pub async fn start_miner(cli: Cli) -> Result<(), Error> {
                     randomx_factory,
                     dataset,
                     stats,
-                    config,
+                    cli,
                 )
             });
         }
@@ -115,7 +108,7 @@ fn thread_work<'a>(
     randomx_factory: &RandomXFactory,
     shared_dataset: Arc<SharedDataset>,
     stats_store: Arc<StatsStore>,
-    config: &RandomXMinerConfig,
+    cli: &Cli,
 ) -> Result<(), MiningError> {
     let runtime = tokio::runtime::Runtime::new().map_err(|e| TokioRuntime(e.to_string()))?;
     let flags = randomx_factory.get_flags()?;
@@ -126,7 +119,7 @@ fn thread_work<'a>(
         client.clone(),
         node_address.to_string(),
         monero_wallet_address.to_string(),
-        config.template_refresh_interval_ms,
+        cli.template_refresh_interval_ms.unwrap_or(15000),
         stop_flag.clone(),
     ));
 
@@ -267,12 +260,11 @@ async fn check_template(
     }
 }
 
-fn monero_base_node_address(cli: &Cli, config: &RandomXMinerConfig) -> Result<String, ConfigError> {
+fn monero_base_node_address(cli: &Cli) -> Result<String, ConfigError> {
     let monero_base_node_address = cli
         .monero_base_node_address
         .as_ref()
         .cloned()
-        .or_else(|| config.monero_base_node_address.as_ref().cloned())
         .or_else(|| {
             if cli.non_interactive_mode {
                 None
@@ -292,12 +284,11 @@ fn monero_base_node_address(cli: &Cli, config: &RandomXMinerConfig) -> Result<St
     Ok(monero_base_node_address)
 }
 
-fn monero_wallet_address(cli: &Cli, config: &RandomXMinerConfig) -> Result<String, ConfigError> {
+fn monero_wallet_address(cli: &Cli) -> Result<String, ConfigError> {
     let monero_wallet_address = cli
         .monero_wallet_address
         .as_ref()
         .cloned()
-        .or_else(|| config.monero_wallet_address.as_ref().cloned())
         .or_else(|| {
             if cli.non_interactive_mode {
                 None

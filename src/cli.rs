@@ -21,17 +21,22 @@
 //  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use std::fmt::Debug;
-
+use std::path::PathBuf;
 use clap::Parser;
-use minotari_app_utilities::common_cli_args::CommonCliArgs;
-use tari_common::configuration::{ConfigOverrideProvider, Network};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 #[clap(propagate_version = true)]
 pub struct Cli {
-    #[clap(flatten)]
-    pub common: CommonCliArgs,
+    #[clap(
+        short,
+        long,
+        aliases = &["base_path", "base_dir", "base-dir"],
+        env = "TARI_BASE_DIR"
+    )]
+    pub base_path: Option<String>,
+    #[clap(long, aliases = &["log_path", "log-dir"])]
+    pub log_path: Option<PathBuf>,
     #[clap(long)]
     pub monero_base_node_address: Option<String>,
     #[clap(long, alias = "user")]
@@ -51,13 +56,6 @@ pub struct Cli {
     /// The port for the http server. Default: 18000
     #[clap(short = 'p', long, alias = "http-port")]
     pub http_port: Option<u16>,
-}
-
-impl ConfigOverrideProvider for Cli {
-    fn get_config_property_overrides(&self, network: &mut Network) -> Vec<(String, String)> {
-        let mut overrides = self.common.get_config_property_overrides(network);
-        *network = self.common.network.unwrap_or(*network);
-        overrides.push(("clythor.network".to_string(), network.to_string()));
-        overrides
-    }
+    #[clap(short = 'r', long, alias = "refresh-interval")]
+    pub template_refresh_interval_ms: Option<u64>,
 }

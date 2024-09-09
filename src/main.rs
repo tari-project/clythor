@@ -21,7 +21,7 @@
 //   USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use std::io::stdout;
-
+use std::path::PathBuf;
 use clap::Parser;
 use crossterm::{execute, terminal::SetTitle};
 use log::*;
@@ -39,11 +39,15 @@ mod error;
 use tari_common::exit_codes::ExitCode;
 mod json_rpc;
 use json_rpc::Request;
+
 mod shared_dataset;
 mod stats_store;
 mod http;
 
-mod config;
+pub fn base_path(cli: &Cli) -> PathBuf {
+    let path = cli.base_path.clone().unwrap_or(env!("CARGO_MANIFEST_DIR").to_string());
+    PathBuf::from(path)
+}
 
 #[tokio::main]
 async fn main() {
@@ -65,8 +69,10 @@ async fn main() {
 async fn main_inner() -> Result<(), ExitError> {
     let cli = Cli::parse();
     initialize_logging(
-        &cli.common.log_config_path("clythor"),
-        &cli.common.get_base_path(),
+        &base_path(&cli).join("config")
+            .join("clythor")
+            .join("log4rs.yml"),
+        &base_path(&cli),
         include_str!("../log4rs_sample.yml"),
     )?;
     start_miner(cli)
