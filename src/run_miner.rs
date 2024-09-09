@@ -26,6 +26,7 @@ use std::{
     thread,
     time::{Duration, Instant},
 };
+
 use dialoguer::Input as InputPrompt;
 use log::{debug, error, info};
 use minotari_app_utilities::parse_miner_input::process_quit;
@@ -37,8 +38,15 @@ use tari_core::proof_of_work::{
 };
 use tari_shutdown::Shutdown;
 
-use crate::{cli::Cli, error::{ConfigError, Error, MiningError, MiningError::TokioRuntime}, http, json_rpc::{get_block_template::get_block_template, submit_block::submit_block}, shared_dataset::SharedDataset, stats_store::StatsStore};
-use crate::http::server::HttpServer;
+use crate::{
+    cli::Cli,
+    error::{ConfigError, Error, MiningError, MiningError::TokioRuntime},
+    http,
+    http::server::HttpServer,
+    json_rpc::{get_block_template::get_block_template, submit_block::submit_block},
+    shared_dataset::SharedDataset,
+    stats_store::StatsStore,
+};
 
 pub const LOG_TARGET: &str = "clythor::main";
 
@@ -184,7 +192,7 @@ fn thread_work<'a>(
                 // Spread out the updates by a few MS to reduce the chances of multiple threads trying to update
                 // the AtomicU64 at the same time.
                 let check_time =
-                    Duration::from_secs(5) + Duration::from_millis((num_threads * 100 / (thread_number+1)) as u64);
+                    Duration::from_secs(5) + Duration::from_millis((num_threads * 100 / (thread_number + 1)) as u64);
                 if elapsed_since_last_check >= check_time {
                     info!(target: LOG_TARGET, "{}", stats_store.pretty_print(thread_number, nonce, cycle_start.elapsed().as_secs(), max_difficulty_reached, block_template.difficulty));
                     stats_last_check_time = Instant::now();

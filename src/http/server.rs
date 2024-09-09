@@ -20,15 +20,20 @@
 //   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 //   USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use crate::http::config;
-use crate::http::handlers::{health, stats, version};
-use crate::stats_store::StatsStore;
-use axum::routing::get;
-use axum::Router;
 use std::sync::Arc;
+
+use axum::{routing::get, Router};
 use tari_shutdown::ShutdownSignal;
 use thiserror::Error;
 use tokio::io;
+
+use crate::{
+    http::{
+        config,
+        handlers::{health, stats, version},
+    },
+    stats_store::StatsStore,
+};
 
 /// An HTTP server that provides stats and other useful information.
 pub struct HttpServer {

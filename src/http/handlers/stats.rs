@@ -20,11 +20,10 @@
 //   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 //   USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use crate::http::server::AppState;
-use axum::extract::State;
-use axum::http::StatusCode;
-use axum::Json;
+use axum::{extract::State, http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
+
+use crate::http::server::AppState;
 
 #[derive(Serialize, Deserialize)]
 pub struct Stats {
