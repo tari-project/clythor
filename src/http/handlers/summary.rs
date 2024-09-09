@@ -20,8 +20,35 @@
 //   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 //   USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-pub mod health;
+use axum::{extract::State, http::StatusCode, Json};
+use serde::{Deserialize, Serialize};
 
-pub mod stats;
-pub mod summary;
-pub mod version;
+use crate::http::server::AppState;
+
+#[derive(Serialize, Deserialize)]
+pub(crate) struct Summary {
+    pub(crate) connection: Connection,
+
+    pub(crate) hashrate: Hashrate,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Connection {
+    pub(crate) uptime: u64,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Hashrate {
+    pub(crate) total: Vec<Option<f64>>,
+}
+
+pub async fn handle_get_summary(State(state): State<AppState>) -> Result<Json<Summary>, StatusCode> {
+    Ok(Json(Summary {
+        connection: Connection {
+            uptime: state.stats_store.elapsed_time(),
+        },
+        hashrate: Hashrate {
+            total: state.stats_store.summary_hashrate(),
+        },
+    }))
+}

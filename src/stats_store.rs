@@ -68,8 +68,23 @@ impl StatsStore {
         self.start_time.load(Ordering::SeqCst)
     }
 
-    fn elapsed_time(&self) -> u64 {
+    pub fn elapsed_time(&self) -> u64 {
+        if self.start_time.load(Ordering::SeqCst) == 0 {
+            return 0;
+        }
+
         EpochTime::now().as_u64() - self.start_time.load(Ordering::SeqCst)
+    }
+
+    // This is a sloppy function. We should at some point track and calculate over the 10s/60s/15m intervals
+    pub fn summary_hashrate(&self) -> Vec<Option<f64>> {
+        let elapsed_time = self.elapsed_time();
+
+        if elapsed_time == 0 {
+            return vec![None, None, None];
+        }
+
+        vec![Some(self.hashes_per_second() as f64), None, None]
     }
 
     pub fn pretty_print(

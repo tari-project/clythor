@@ -30,7 +30,7 @@ use tokio::io;
 use crate::{
     http::{
         config,
-        handlers::{health, stats, version},
+        handlers::{health, stats, summary, version},
     },
     stats_store::StatsStore,
 };
@@ -67,6 +67,8 @@ impl HttpServer {
             .route("/health", get(health::handle_health))
             .route("/version", get(version::handle_version))
             .route("/stats", get(stats::handle_get_stats))
+            // Copy XMRigs summary page
+            .route("/2/summary", get(summary::handle_get_summary))
             .with_state(AppState {
                 stats_store: self.stats_store.clone(),
             })
