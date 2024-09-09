@@ -93,7 +93,7 @@ mod test {
     #[test]
     fn miner_configuration() {
         const CONFIG: &str = r#"
-[miner]
+[clythor]
 monero_wallet_address="44AFFq5kSiGBoZ4NMDwYtN18obc8AemS33DBLWs3H7otXft3XjrpDtQGv7SqSsaBYBb98uNbr2VBBEt7f2wfn3RVGQBEP3A"
 mode = "eco"
 "#;
