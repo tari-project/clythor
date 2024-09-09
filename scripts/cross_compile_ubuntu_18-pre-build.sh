@@ -155,7 +155,7 @@ EoF
   # packages needed for Ledger and hidapi
   apt-get --assume-yes install \
     libsqlite3-dev:${CROSS_DEB_ARCH} \
-    libssl-dev:arm64:${CROSS_DEB_ARCH} \
+    libssl-dev:${CROSS_DEB_ARCH} \
     libudev-dev:${CROSS_DEB_ARCH} \
     libhidapi-dev:${CROSS_DEB_ARCH}
 
