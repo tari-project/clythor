@@ -27,7 +27,7 @@ use serde_json::json;
 
 use crate::{error::RequestError, Request};
 
-pub const LOG_TARGET: &str = "minotari::randomx_miner::json_rpc::get_block_template";
+pub const LOG_TARGET: &str = "clythor::json_rpc::get_block_template";
 
 #[allow(dead_code)] // jsonrpc and id fields
 #[derive(Deserialize, Debug)]

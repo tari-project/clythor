@@ -34,8 +34,8 @@ mod stats_store;
 use run_miner::start_miner;
 use tari_common::exit_codes::{ExitCode, ExitError};
 
-pub const LOG_TARGET: &str = "minotari::randomx_miner::main";
-pub const LOG_TARGET_FILE: &str = "minotari::logging::randomx_miner::main";
+pub const LOG_TARGET: &str = "clythor::main";
+pub const LOG_TARGET_FILE: &str = "minotari::logging::clythor::main";
 
 // non-64-bit not supported
 minotari_app_utilities::deny_non_64_bit_archs!();

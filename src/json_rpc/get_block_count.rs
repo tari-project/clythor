@@ -26,7 +26,7 @@ use serde::Deserialize;
 
 use crate::{error::RequestError, Request};
 
-pub const LOG_TARGET: &str = "minotari::randomx_miner::json_rpc::get_block_count";
+pub const LOG_TARGET: &str = "clythor::json_rpc::get_block_count";
 
 #[allow(dead_code)] // jsonrpc and id fields
 #[derive(Deserialize, Debug)]

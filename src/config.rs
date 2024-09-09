@@ -56,7 +56,7 @@ pub enum MiningMode {
 
 impl SubConfigPath for RandomXMinerConfig {
     fn main_key_prefix() -> &'static str {
-        "randomx_miner"
+        "clythor"
     }
 }
 
@@ -68,7 +68,7 @@ impl Default for RandomXMinerConfig {
             universe_address: None,
             mode: Default::default(),
             network: Default::default(),
-            config_dir: PathBuf::from("config/randomx_miner"),
+            config_dir: PathBuf::from("config/clythor"),
             num_mining_threads: num_cpus::get(),
             template_refresh_interval_ms: 15000,
         }

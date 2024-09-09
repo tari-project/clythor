@@ -28,8 +28,8 @@ use log::*;
 use minotari_app_utilities::consts;
 use tari_common::{exit_codes::ExitError, initialize_logging};
 
-pub const LOG_TARGET: &str = "minotari::randomx_miner::main";
-pub const LOG_TARGET_FILE: &str = "minotari::logging::randomx_miner::main";
+pub const LOG_TARGET: &str = "clythor::main";
+pub const LOG_TARGET_FILE: &str = "minotari::logging::clythor::main";
 
 mod cli;
 use cli::Cli;
@@ -64,7 +64,7 @@ async fn main() {
 async fn main_inner() -> Result<(), ExitError> {
     let cli = Cli::parse();
     initialize_logging(
-        &cli.common.log_config_path("randomx_miner"),
+        &cli.common.log_config_path("clythor"),
         &cli.common.get_base_path(),
         include_str!("../log4rs_sample.yml"),
     )?;

@@ -60,8 +60,6 @@ pub enum MiningError {
     Difficulty(#[from] tari_core::proof_of_work::DifficultyError),
     #[error("RandomXVMFactoryError`: {0}")]
     RandomXVMFactory(#[from] tari_core::proof_of_work::randomx_factory::RandomXVMFactoryError),
-    #[error("HexError`: {0}")]
-    Hex(#[from] tari_utilities::hex::HexError),
     #[error("FromHexError`: {0}")]
     FromHex(#[from] hex::FromHexError),
     #[error("MergeMineError`: {0}")]

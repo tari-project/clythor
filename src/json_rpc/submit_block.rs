@@ -26,7 +26,7 @@ use serde_json::json;
 
 use crate::{error::RequestError, json_rpc::Request};
 
-pub const LOG_TARGET: &str = "minotari::randomx_miner::json_rpc::submit_block";
+pub const LOG_TARGET: &str = "clythor::json_rpc::submit_block";
 
 pub async fn submit_block<'a>(client: &Client, node_address: &'a str, block_hash: String) -> Result<(), RequestError> {
     let response = client

@@ -48,7 +48,7 @@ use crate::{
     stats_store::StatsStore,
 };
 
-pub const LOG_TARGET: &str = "minotari::randomx_miner::main";
+pub const LOG_TARGET: &str = "clythor::main";
 
 pub async fn start_miner(cli: Cli) -> Result<(), Error> {
     let config_path = cli.common.config_path();

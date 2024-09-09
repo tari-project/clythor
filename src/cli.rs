@@ -54,7 +54,7 @@ impl ConfigOverrideProvider for Cli {
     fn get_config_property_overrides(&self, network: &mut Network) -> Vec<(String, String)> {
         let mut overrides = self.common.get_config_property_overrides(network);
         *network = self.common.network.unwrap_or(*network);
-        overrides.push(("randomx_miner.network".to_string(), network.to_string()));
+        overrides.push(("clythor.network".to_string(), network.to_string()));
         overrides
     }
 }
