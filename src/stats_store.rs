@@ -21,10 +21,11 @@
 //  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use std::sync::atomic::{AtomicU64, Ordering};
-
+use serde::{Deserialize, Serialize};
 use tari_utilities::epoch_time::EpochTime;
 
 /// Stats store stores statistics about running miner in memory.
+#[derive(Serialize, Deserialize)]
 pub struct StatsStore {
     start_time: AtomicU64,
     hashed_count: AtomicU64,

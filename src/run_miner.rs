@@ -28,7 +28,7 @@ use std::{
 };
 
 use dialoguer::Input as InputPrompt;
-use log::{debug, info};
+use log::{debug, error, info};
 use minotari_app_utilities::parse_miner_input::process_quit;
 use randomx_rs::RandomXFlag;
 use reqwest::Client as ReqwestClient;
@@ -39,14 +39,8 @@ use tari_core::proof_of_work::{
 };
 use tari_shutdown::Shutdown;
 
-use crate::{
-    cli::Cli,
-    config::RandomXMinerConfig,
-    error::{ConfigError, Error, MiningError, MiningError::TokioRuntime},
-    json_rpc::{get_block_template::get_block_template, submit_block::submit_block},
-    shared_dataset::SharedDataset,
-    stats_store::StatsStore,
-};
+use crate::{cli::Cli, config::RandomXMinerConfig, error::{ConfigError, Error, MiningError, MiningError::TokioRuntime}, http, json_rpc::{get_block_template::get_block_template, submit_block::submit_block}, shared_dataset::SharedDataset, stats_store::StatsStore};
+use crate::http::server::HttpServer;
 
 pub const LOG_TARGET: &str = "clythor::main";
 
@@ -69,6 +63,15 @@ pub async fn start_miner(cli: Cli) -> Result<(), Error> {
     let randomx_factory = RandomXFactory::new_with_flags(num_threads, flags);
     let shared_dataset = Arc::new(SharedDataset::default());
     let stats_store = Arc::new(StatsStore::new(num_threads));
+
+    // http server
+    let http_server_config = http::config::Config::new(config.http_port);
+    let http_server = HttpServer::new(shutdown.to_signal(), http_server_config, stats_store.clone());
+    tokio::spawn(async move {
+        if let Err(error) = http_server.start().await {
+            error!("Failed to start HTTP server: {error:?}");
+        }
+    });
 
     info!(target: LOG_TARGET, "Starting {} threads", num_threads);
 

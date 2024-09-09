@@ -20,29 +20,19 @@
 //   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 //   USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mod cli;
-use cli::Cli;
-mod config;
-mod error;
-pub use error::{ConfigError, Error};
-mod json_rpc;
-pub use json_rpc::Request;
-mod run_miner;
-mod shared_dataset;
-mod stats_store;
-mod http;
+use crate::http::server::AppState;
+use axum::extract::State;
+use axum::http::StatusCode;
+use axum::Json;
+use serde::{Deserialize, Serialize};
 
-use run_miner::start_miner;
-use tari_common::exit_codes::{ExitCode, ExitError};
+#[derive(Serialize, Deserialize)]
+pub struct Stats {
+    pub hashes_per_second: u64,
+}
 
-pub const LOG_TARGET: &str = "clythor::main";
-pub const LOG_TARGET_FILE: &str = "minotari::logging::clythor::main";
-
-// non-64-bit not supported
-minotari_app_utilities::deny_non_64_bit_archs!();
-
-pub async fn run_miner(cli: Cli) -> Result<(), ExitError> {
-    start_miner(cli)
-        .await
-        .map_err(|e| ExitError::new(ExitCode::UnknownError, e.to_string()))
+pub async fn handle_get_stats(State(state): State<AppState>) -> Result<Json<Stats>, StatusCode> {
+    Ok(Json(Stats {
+        hashes_per_second: state.stats_store.hashes_per_second(),
+    }))
 }

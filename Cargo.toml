@@ -17,6 +17,7 @@ tari_core = { git = "https://github.com/tari-project/tari.git", rev = "825ca06" 
 tari_utilities = "0.7.0"
 tari_shutdown = { git = "https://github.com/tari-project/tari.git", rev = "825ca06" }
 
+axum = "0.7.5"
 clap = { version = "3.2", features = ["derive", "env"] }
 config = "0.14.0"
 crossterm = { version = "0.28.1" }

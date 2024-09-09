@@ -41,6 +41,7 @@ mod json_rpc;
 use json_rpc::Request;
 mod shared_dataset;
 mod stats_store;
+mod http;
 
 mod config;
 
