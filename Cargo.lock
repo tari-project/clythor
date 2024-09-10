@@ -628,7 +628,7 @@ dependencies = [
 
 [[package]]
 name = "clythor"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "axum 0.7.5",
  "clap 3.2.25",
