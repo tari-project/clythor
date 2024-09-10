@@ -285,7 +285,7 @@ jobs:
           endpoint: https://eus.codesigning.azure.net/
           trusted-signing-account-name: Tari
           certificate-profile-name: Tarilabs
-          files-folder: ${{ github.workspace }}/target/${{ matrix.builds.target }}/
+          files-folder: ${{ github.workspace }}/target/${{ matrix.builds.target }}/release/
           files-folder-filter: exe,dll
           file-digest: SHA256
           timestamp-rfc3161: http://timestamp.acs.microsoft.com
