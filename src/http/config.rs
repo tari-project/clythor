@@ -22,16 +22,11 @@
 
 pub struct Config {
     pub port: u16,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self { port: 18000 }
-    }
+    pub bearer_token: Option<String>,
 }
 
 impl Config {
-    pub fn new(port: u16) -> Self {
-        Self { port }
+    pub fn new(port: u16, bearer_token: Option<String>) -> Self {
+        Self { port, bearer_token }
     }
 }

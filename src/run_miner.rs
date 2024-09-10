@@ -66,7 +66,7 @@ pub async fn start_miner(cli: Cli) -> Result<(), Error> {
     let stats_store = Arc::new(StatsStore::new(num_threads));
 
     // http server
-    let http_server_config = http::config::Config::new(cli.http_port.unwrap_or(18000u16));
+    let http_server_config = http::config::Config::new(cli.http_port.unwrap_or(18000u16), cli.access_token.clone());
     let http_server = HttpServer::new(shutdown.to_signal(), http_server_config, stats_store.clone());
     tokio::spawn(async move {
         if let Err(error) = http_server.start().await {

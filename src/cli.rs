@@ -56,6 +56,9 @@ pub struct Cli {
     /// The port for the http server. Default: 18000
     #[clap(short = 'p', long, alias = "http-port")]
     pub http_port: Option<u16>,
+    /// Access token for the http server, required to make requests
+    #[clap(short, long)]
+    pub access_token: Option<String>,
     #[clap(short = 'r', long, alias = "refresh-interval")]
     pub template_refresh_interval_ms: Option<u64>,
 }

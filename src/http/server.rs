@@ -22,7 +22,14 @@
 
 use std::sync::Arc;
 
-use axum::{routing::get, Router};
+use axum::{
+    http::{header::AUTHORIZATION, Request, StatusCode},
+    middleware::{self, Next},
+    response::IntoResponse,
+    routing::get,
+    Router,
+};
+use log::{debug, info};
 use tari_shutdown::ShutdownSignal;
 use thiserror::Error;
 use tokio::io;
@@ -51,6 +58,7 @@ pub enum Error {
 #[derive(Clone)]
 pub struct AppState {
     pub stats_store: Arc<StatsStore>,
+    pub bearer_token: Option<String>,
 }
 
 impl HttpServer {
@@ -62,16 +70,51 @@ impl HttpServer {
         }
     }
 
+    async fn auth_bearer(
+        req: Request<axum::body::Body>,
+        next: Next,
+        token: Option<String>,
+    ) -> Result<impl IntoResponse, StatusCode> {
+        if let Some(auth_header) = req.headers().get(AUTHORIZATION) {
+            if let Ok(auth_str) = auth_header.to_str() {
+                if auth_str.starts_with("Bearer") {
+                    let token_from_header = &auth_str["Bearer ".len()..];
+                    match token {
+                        Some(ref token) => {
+                            if token_from_header == token {
+                                return Ok(next.run(req).await);
+                            }
+                        },
+                        None => return Ok(next.run(req).await),
+                    }
+                }
+            }
+        }
+        Err(StatusCode::UNAUTHORIZED)
+    }
+
     pub fn routes(&self) -> Router {
-        Router::new()
-            .route("/health", get(health::handle_health))
+        let app_state = AppState {
+            stats_store: self.stats_store.clone(),
+            bearer_token: self.config.bearer_token.clone(),
+        };
+
+        let token = app_state.bearer_token.clone();
+
+        let protected_routes = Router::new()
             .route("/version", get(version::handle_version))
             .route("/stats", get(stats::handle_get_stats))
             // Copy XMRigs summary page
             .route("/2/summary", get(summary::handle_get_summary))
-            .with_state(AppState {
-                stats_store: self.stats_store.clone(),
-            })
+            .layer(middleware::from_fn(move |req, next| {
+                let token_clone = token.clone();
+                async { Self::auth_bearer(req, next, token_clone).await }
+            }));
+
+        Router::new()
+            .route("/health", get(health::handle_health))
+            .nest("/", protected_routes)
+            .with_state(app_state)
     }
 
     /// Starts the http server on the port passed in ['HttpServer::new']
@@ -80,12 +123,12 @@ impl HttpServer {
         let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", self.config.port))
             .await
             .map_err(Error::IO)?;
-        println!("Starting HTTP server at http://127.0.0.1:{}", self.config.port);
+        info!("Starting HTTP server at http://127.0.0.1:{}", self.config.port);
         axum::serve(listener, router)
             .with_graceful_shutdown(self.shutdown_signal.clone())
             .await
             .map_err(Error::IO)?;
-        println!("HTTP server stopped!");
+        debug!("HTTP server stopped!");
         Ok(())
     }
 }
