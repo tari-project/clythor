@@ -44,6 +44,12 @@ else
   exit 1
 fi
 
+DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-noninteractive}
+# Hack of Note - workaround for apt asking for timezone info
+TimeZone=${TimeZone:-"Etc/GMT"}
+ln -snf /usr/share/zoneinfo/${TimeZone} /etc/localtime
+echo ${TimeZone} > /etc/timezone
+
 crossArch=${CROSS_DEB_ARCH}
 apt-get update
 
@@ -63,6 +69,7 @@ apt-get install --no-install-recommends --assume-yes \
   libsqlite3-0 \
   libreadline-dev \
   git \
+  make \
   cmake \
   dh-autoreconf \
   clang \
@@ -148,7 +155,6 @@ EoF
 
   # scripts/install_ubuntu_dependencies-cross_compile.sh x86-64
   apt-get --assume-yes install \
-    pkg-config-${targetPlatform}-linux-gnu \
     gcc-${targetPlatform}-linux-gnu \
     g++-${targetPlatform}-linux-gnu
 
