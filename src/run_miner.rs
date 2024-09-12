@@ -29,7 +29,6 @@ use std::{
 
 use dialoguer::Input as InputPrompt;
 use log::{debug, error, info};
-use minotari_app_utilities::parse_miner_input::process_quit;
 use randomx_rs::RandomXFlag;
 use reqwest::Client as ReqwestClient;
 use tari_core::proof_of_work::{
@@ -314,4 +313,21 @@ fn monero_wallet_address(cli: &Cli) -> Result<String, ConfigError> {
     info!(target: LOG_TARGET, "Mining to Monero wallet address: {}", &monero_wallet_address);
 
     Ok(monero_wallet_address)
+}
+
+/// User requested quit
+pub fn process_quit(command: &str) {
+    if command.to_uppercase() == "QUIT" || command.to_uppercase() == "EXIT" {
+        println!("\nUser requested quit (Press 'Enter')");
+        wait_for_keypress();
+        std::process::exit(0);
+    }
+}
+
+/// Wait for a keypress before continuing
+pub fn wait_for_keypress() {
+    use std::io::{stdin, Read};
+    let mut stdin = stdin();
+    let buf: &mut [u8] = &mut [0; 2];
+    let _unused = stdin.read(buf).expect("Error reading keypress");
 }
